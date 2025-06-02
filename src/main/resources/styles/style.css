@@ -1,0 +1,25 @@
+.app-title {
+    -fx-font-size: 60px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E4053;
+    -fx-padding: 10 0 20 0;
+    -fx-alignment: center;
+}
+
+/* logger.css */
+
+.logger-container {
+    -fx-background-color: white;
+}
+
+.logger-scrollpane {
+    -fx-background: white;
+    -fx-border-color: lightgray;
+    -fx-pref-width: 460px;
+    -fx-pref-height: 500x;
+}
+
+.logger-textflow {
+    -fx-background-color: white;
+    -fx-padding: 10;
+}
