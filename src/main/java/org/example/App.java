@@ -35,13 +35,12 @@ public class App extends Application {
         Button preset1Button = new Button("Экспорт в Формате 1");
         preset1Button.setDisable(true);
         TextField chosenFolder = new TextField();
-        Image icon = new Image("file:src/images/icon.png");
         Separator separator = new Separator(Orientation.VERTICAL);
 
         folderButton.setOnAction(e -> chooseFolder(stage, chosenFolder, logger, exportButton, preset1Button));
         exportButton.setOnAction(e -> runExportScriptAsync(0, logger));
         preset1Button.setOnAction(e -> runExportScriptAsync(1, logger));
-        chosenFolder.setPrefColumnCount(38);
+        chosenFolder.setPrefColumnCount(45);
         title.getStyleClass().add("app-title");
 
         tableTreeView.setShowRoot(false);
@@ -66,6 +65,7 @@ public class App extends Application {
         stage.setResizable(false);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/style.css")).toExternalForm());
         stage.setTitle("XMLoader");
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png")));
         stage.getIcons().add(icon);
         stage.setScene(scene);
         stage.show();
