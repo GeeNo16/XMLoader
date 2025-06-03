@@ -74,6 +74,7 @@ public class SqliteToExcelExporter {
             }
         }
         if (!folder.delete()) logger.log("Ошибка удаления папки", Color.RED);
+        logger.log("Готово!", Color.BLACK);
     }
 
 

@@ -16,7 +16,7 @@
     -fx-background: white;
     -fx-border-color: lightgray;
     -fx-pref-width: 460px;
-    -fx-pref-height: 500x;
+    -fx-pref-height: 500px;
 }
 
 .logger-textflow {

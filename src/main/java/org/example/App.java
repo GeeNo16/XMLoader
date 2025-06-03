@@ -38,8 +38,8 @@ public class App extends Application {
         Separator separator = new Separator(Orientation.VERTICAL);
 
         folderButton.setOnAction(e -> chooseFolder(stage, chosenFolder, logger, exportButton, preset1Button));
-        exportButton.setOnAction(e -> runExportScriptAsync(0, logger));
-        preset1Button.setOnAction(e -> runExportScriptAsync(1, logger));
+        exportButton.setOnAction(e -> runExportScriptAsync(0, logger, exportButton, preset1Button));
+        preset1Button.setOnAction(e -> runExportScriptAsync(1, logger, exportButton, preset1Button));
         chosenFolder.setPrefColumnCount(45);
         title.getStyleClass().add("app-title");
 
@@ -113,10 +113,12 @@ public class App extends Application {
     }
 
 
-    private void runExportScriptAsync(int preset, Logger logger) {
+    private void runExportScriptAsync(int preset, Logger logger, Button btn1, Button btn2) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
+                btn1.setDisable(true);
+                btn2.setDisable(true);
                 CheckBoxTreeItem<String> root = (CheckBoxTreeItem<String>) tableTreeView.getRoot();
                 HashMap<String, String> columns = new HashMap<>();
 
@@ -144,6 +146,18 @@ public class App extends Application {
                 }
 
                 return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                btn1.setDisable(false);
+                btn2.setDisable(false);
+            }
+
+            @Override
+            protected void failed() {
+                btn1.setDisable(false);
+                btn2.setDisable(false);
             }
         };
 
