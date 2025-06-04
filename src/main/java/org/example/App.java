@@ -15,6 +15,7 @@ import javafx.stage.*;
 
 import java.io.File;
 import java.util.*;
+import java.time.LocalDateTime;
 
 public class App extends Application {
     private final TreeView<String> tableTreeView = new TreeView<>(new CheckBoxTreeItem<>("root"));
@@ -63,6 +64,7 @@ public class App extends Application {
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setResizable(false);
+        stage.setOnCloseRequest(e -> runClose(chosenFolder, logger));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/style.css")).toExternalForm());
         stage.setTitle("XMLoader");
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png")));
@@ -77,6 +79,14 @@ public class App extends Application {
         selectedFolder = dirChooser.showDialog(stage);
         if (selectedFolder != null) chosenFolder.setText(selectedFolder.getAbsolutePath());
         runParseScriptAsync(logger, btn1, btn2);
+    }
+
+    private void runClose(TextField chosenFolder, Logger logger) {
+        String folder = chosenFolder.getText() + "/databases";
+        if (!new File(folder).exists()) return;
+        XmlToSqliteParser parser = new XmlToSqliteParser(logger);
+        System.out.println("Done");
+        parser.clear(folder);
     }
 
     private void runParseScriptAsync(Logger logger, Button btn1, Button btn2) {
@@ -117,6 +127,7 @@ public class App extends Application {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
+                LocalDateTime now = LocalDateTime.now();
                 btn1.setDisable(true);
                 btn2.setDisable(true);
                 CheckBoxTreeItem<String> root = (CheckBoxTreeItem<String>) tableTreeView.getRoot();
@@ -137,7 +148,7 @@ public class App extends Application {
 
                 SqliteToExcelExporter exporter = new SqliteToExcelExporter(columns, logger);
                 String inputPath = selectedFolder.getAbsolutePath() + "/databases";
-                String outputPath = selectedFolder.getAbsolutePath() + "/output.xlsx";
+                String outputPath = selectedFolder.getAbsolutePath() + "/output" + now + ".xlsx";
 
                 try {
                     exporter.exportToExcel(inputPath, outputPath);

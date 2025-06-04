@@ -66,17 +66,13 @@ public class SqliteToExcelExporter {
                     System.err.println("Ошибка подключения к базе: " + dbFile.getName() + " — " + e.getMessage());
                     logger.log(" → Ошибка: " + e.getMessage() + "\n", Color.RED);
                 }
-                if (!dbFile.delete()) logger.log("Ошибка удаления файла", Color.RED);
             }
-
             try (FileOutputStream fileOut = new FileOutputStream(outputExcelPath)) {
                 workbook.write(fileOut);
             }
         }
-        if (!folder.delete()) logger.log("Ошибка удаления папки", Color.RED);
         logger.log("Готово!", Color.BLACK);
     }
-
 
 
     private String extractValues(Connection conn, String tablePath) {
@@ -100,7 +96,7 @@ public class SqliteToExcelExporter {
                     results.add(val.trim());
                 }
             }
-            return String.join(",", results);
+            return String.join(", ", results);
         } catch (SQLException e) {
             return "";
         }

@@ -67,7 +67,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.example.MainClass</mainClass> <!-- Укажите свой главный класс -->
+                            <mainClass>org.example.App</mainClass> <!-- Укажите свой главный класс -->
                         </manifest>
                     </archive>
                 </configuration>

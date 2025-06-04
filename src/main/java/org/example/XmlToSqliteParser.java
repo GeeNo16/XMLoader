@@ -221,4 +221,15 @@ public class XmlToSqliteParser {
     public HashSet<String> getNamespace() {
         return namespace;
     }
+
+    public void clear(String dbFolderPath) {
+        File folder = new File(dbFolderPath);
+        File[] dbFiles = folder.listFiles((dir, name) -> name.endsWith(".db"));
+        System.out.println("Done");
+        if (dbFiles == null) return;
+        for (File dbFile : dbFiles) {
+            if (!dbFile.delete()) logger.log("Ошибка удаления файла: " + dbFile.getAbsolutePath(), Color.RED);
+        }
+        if (!folder.delete()) logger.log("Ошибка удаления папки: " + folder.getAbsolutePath(), Color.RED);
+    }
 }
