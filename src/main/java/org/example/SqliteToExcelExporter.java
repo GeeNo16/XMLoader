@@ -39,10 +39,19 @@ public class SqliteToExcelExporter {
             fileNameHeader.setCellValue("Файл");
 
             List<String> keys = new ArrayList<>(tableColumnMap.keySet());
+            keys.addAll(Storage.restrictions.keySet());
+            Map<Integer, List<String>> filesRestrictions = new HashMap<>();
+            Map<String, Integer> nameColumn = new HashMap<>();
             for (String key : keys) {
                 Cell cell = headerRow.createCell(colNum++);
-                cell.setCellValue(tableColumnMap.get(key));
+                if (Storage.restrictions.containsKey(key)){
+                    cell.setCellValue(Storage.restrictions.get(key));
+                    nameColumn.put(Storage.restrictions.get(key).trim().toLowerCase(), colNum - 1);
+                }
+                else cell.setCellValue(tableColumnMap.get(key));
             }
+            System.out.println(nameColumn.keySet());
+            System.out.println(nameColumn.values());
 
             int count = 1;
             for (File dbFile : dbFiles) {
@@ -60,6 +69,14 @@ public class SqliteToExcelExporter {
                         String value = extractValues(conn, tablePath);
                         if (value.length() > 32000) dataRow.createCell(colNum++).setCellValue(value.substring(0, 32000));
                         else dataRow.createCell(colNum++).setCellValue(value);
+                        if (Objects.equals(tablePath, "extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.restriction_encumbrance_type.value")){
+                            if (!value.isEmpty()) {
+                                if (value.contains(",")) {
+                                    List<String> rests = Arrays.stream(value.split(",")).toList();
+                                    filesRestrictions.put(rowNum - 1, rests);
+                                } else filesRestrictions.put(rowNum - 1, Collections.singletonList(value));
+                            }
+                        }
                     }
                     logger.log(" → Успешно: " + dbFile.getName() + "\n", Color.GREEN);
                 } catch (SQLException e) {
@@ -67,6 +84,24 @@ public class SqliteToExcelExporter {
                     logger.log(" → Ошибка: " + e.getMessage() + "\n", Color.RED);
                 }
             }
+
+            if (!filesRestrictions.isEmpty()) {
+                for (Map.Entry<Integer, List<String>> entry : filesRestrictions.entrySet()) {
+                    if (!entry.getValue().isEmpty()) {
+                        for (String value : entry.getValue()) {
+                            String rework;
+                            if (value.contains("X")) rework = value.split(" X ")[0].trim().toLowerCase();
+                            else rework = value.trim().toLowerCase();
+                            System.out.println(rework);
+                            if (sheet.getRow(entry.getKey()) != null){
+                                Row row = sheet.getRow(entry.getKey());
+                                if (nameColumn.get(rework) != null) row.createCell(nameColumn.get(rework)).setCellValue(value);
+                            }
+                        }
+                    }
+                }
+            }
+
             try (FileOutputStream fileOut = new FileOutputStream(outputExcelPath)) {
                 workbook.write(fileOut);
             }
@@ -74,13 +109,12 @@ public class SqliteToExcelExporter {
         logger.log("Готово!", Color.BLACK);
     }
 
-
     private String extractValues(Connection conn, String tablePath) {
         String sql = "SELECT text_content FROM \"" + tablePath + "\" WHERE text_content IS NOT NULL";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             List<String> results = new ArrayList<>();
-            int count = 0;
+            int count = 1;
             String previous = "";
             while (rs.next()) {
                 String val = rs.getString("text_content");

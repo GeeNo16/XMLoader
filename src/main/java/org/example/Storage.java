@@ -32,4 +32,19 @@ public class Storage {
         put("extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.restriction_encumbrance_type.value", "Ограничения");
     }};
 
+    public static final Map<String, String> restrictions = new HashMap<>() {{
+        put("022006000000", "Аренда");
+        put("022003000000", "Запрещение регистрации");
+        put("022007000000", "Ипотека");
+        put("022002000000", "Арест");
+        put("022099000000", "Прочие ограничения прав и обременения объекта недвижимости");
+    }};
+
+    public static final Map<String, String> restrictions_reverse = new HashMap<>() {{
+        put("Аренда", "022006000000");
+        put("Запрещение регистрации", "022003000000");
+        put("Ипотека", "022007000000");
+        put("Арест", "022002000000");
+        put("Прочие ограничения прав и обременения объекта недвижимости", "022099000000");
+    }};
 }
