@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.*;
 
 import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalDateTime;
 
@@ -64,7 +65,7 @@ public class App extends Application {
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setResizable(false);
-        stage.setOnCloseRequest(e -> runClose(chosenFolder, logger));
+        //stage.setOnCloseRequest(e -> runClose(chosenFolder, logger));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/style.css")).toExternalForm());
         stage.setTitle("XMLoader");
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png")));
@@ -127,7 +128,8 @@ public class App extends Application {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd;HH-mm-ss");
+                String now = LocalDateTime.now().format(formatter);
                 btn1.setDisable(true);
                 btn2.setDisable(true);
                 CheckBoxTreeItem<String> root = (CheckBoxTreeItem<String>) tableTreeView.getRoot();
@@ -151,7 +153,7 @@ public class App extends Application {
                 String outputPath = selectedFolder.getAbsolutePath() + "/output" + now + ".xlsx";
 
                 try {
-                    exporter.exportToExcel(inputPath, outputPath);
+                    exporter.exportToExcel(inputPath, outputPath, preset);
                 } catch (Exception e) {
                     logger.log("Ошибка экспорта: " + e.getMessage(), Color.RED);
                 }
@@ -174,6 +176,4 @@ public class App extends Application {
 
         new Thread(task).start();
     }
-
-
 }

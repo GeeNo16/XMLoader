@@ -18,7 +18,12 @@ public class SqliteToExcelExporter {
         this.logger = logger;
     }
 
-    public void exportToExcel(String folderPath, String outputExcelPath) throws Exception {
+    public void exportToExcel(String folderPath, String outputExcelPath, int preset) throws Exception {
+        List<String> targetTags = new ArrayList<>(List.of(
+                "extract_about_property_land.restrict_records.restrict_record.right_holders.right_holder.legal_entity.entity.resident.name",
+                "extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.period.period_info.end_date",
+                "extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.period.period_info.start_date"
+        ));
         File folder = new File(folderPath);
         File[] dbFiles = folder.listFiles((dir, name) -> name.endsWith(".db"));
 
@@ -42,16 +47,19 @@ public class SqliteToExcelExporter {
             keys.addAll(Storage.restrictions.keySet());
             Map<Integer, List<String>> filesRestrictions = new HashMap<>();
             Map<String, Integer> nameColumn = new HashMap<>();
+            List<Integer> targetColumns = new ArrayList<>();
             for (String key : keys) {
                 Cell cell = headerRow.createCell(colNum++);
                 if (Storage.restrictions.containsKey(key)){
                     cell.setCellValue(Storage.restrictions.get(key));
                     nameColumn.put(Storage.restrictions.get(key).trim().toLowerCase(), colNum - 1);
                 }
+                if (targetTags.contains(key)) {
+                    targetColumns.add(colNum - 1);
+                    cell.setCellValue(Storage.preset1.get(key));
+                }
                 else cell.setCellValue(tableColumnMap.get(key));
             }
-            System.out.println(nameColumn.keySet());
-            System.out.println(nameColumn.values());
 
             int count = 1;
             for (File dbFile : dbFiles) {
@@ -80,7 +88,6 @@ public class SqliteToExcelExporter {
                     }
                     logger.log(" → Успешно: " + dbFile.getName() + "\n", Color.GREEN);
                 } catch (SQLException e) {
-                    System.err.println("Ошибка подключения к базе: " + dbFile.getName() + " — " + e.getMessage());
                     logger.log(" → Ошибка: " + e.getMessage() + "\n", Color.RED);
                 }
             }
@@ -92,7 +99,6 @@ public class SqliteToExcelExporter {
                             String rework;
                             if (value.contains("X")) rework = value.split(" X ")[0].trim().toLowerCase();
                             else rework = value.trim().toLowerCase();
-                            System.out.println(rework);
                             if (sheet.getRow(entry.getKey()) != null){
                                 Row row = sheet.getRow(entry.getKey());
                                 if (nameColumn.get(rework) != null) row.createCell(nameColumn.get(rework)).setCellValue(value);
@@ -102,11 +108,58 @@ public class SqliteToExcelExporter {
                 }
             }
 
+            if (preset == 1) {
+                boolean flag = false;
+                for (Row row : sheet) {
+                    if (flag) {
+                        String fileName = row.getCell(0).getStringCellValue().replace(".db", ".xml");
+                        String path = folderPath.replace("databases", fileName);
+                        Map<String, String> fits = DubolomParser.parseDubolom(path);
+                        if (!fits.isEmpty()) {
+                            for (int n : targetColumns) {
+                                String cellData = row.getCell(n).getStringCellValue();
+                                List<String> info = getStrings(cellData);
+                                List<String> filtered = new ArrayList<>();
+                                for (String part : info) {
+                                    String code = fits.get(part);
+                                    if (Objects.equals(code, "022006000000")) {
+                                        filtered.add(part);
+                                    }
+                                }
+                                if (filtered.size() > 1) {
+                                    row.getCell(n).setCellValue(String.join(",", filtered));
+                                } else if (filtered.size() == 1) {
+                                    row.getCell(n).setCellValue(filtered.getFirst());
+                                } else {
+                                    row.getCell(n).setCellValue("");
+                                }
+                            }
+                        }
+                    } else flag = true;
+                }
+            }
+
             try (FileOutputStream fileOut = new FileOutputStream(outputExcelPath)) {
                 workbook.write(fileOut);
             }
         }
         logger.log("Готово!", Color.BLACK);
+    }
+
+    private static List<String> getStrings(String cellData) {
+        List<String> info = new ArrayList<>();
+        if (cellData.contains(",")) {
+            String[] prepare = cellData.split(",");
+            for (String s : prepare) {
+                if (s.contains("X")) info.add(s.split(" X ")[0].trim());
+                else info.add(s.trim());
+            }
+        }
+        else {
+            if (cellData.contains("X")) info.add(cellData.split(" X ")[0].trim());
+            else info.add(cellData.trim());
+        }
+        return info;
     }
 
     private String extractValues(Connection conn, String tablePath) {

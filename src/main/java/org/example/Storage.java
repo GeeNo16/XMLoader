@@ -18,7 +18,7 @@ public class Storage {
         put("extract_about_property_land.land_record.params.category.type.value", "Категория земель");
         put("extract_about_property_land.land_record.cad_works.cad_work.date_cadastral", "Дата");
         put("extract_about_property_land.land_record.cad_links.common_land.common_land_parts.included_cad_numbers.included_cad_number.cad_number", "Входящие в Единое землепользование контуры");
-        put("extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.period.period_info.end_date", "extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.period.period_info.end_date");
+        put("extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.period.period_info.end_date", "Конец аренды");
         put("extract_about_property_land.land_record.address_location.address.readable_address", "Адрес");
         put("extract_about_property_land.land_record.params.area.value", "Площадь");
         put("extract_about_property_land.land_record.params.permitted_use.permitted_use_established.by_document", "ВРИ");
@@ -38,13 +38,5 @@ public class Storage {
         put("022007000000", "Ипотека");
         put("022002000000", "Арест");
         put("022099000000", "Прочие ограничения прав и обременения объекта недвижимости");
-    }};
-
-    public static final Map<String, String> restrictions_reverse = new HashMap<>() {{
-        put("Аренда", "022006000000");
-        put("Запрещение регистрации", "022003000000");
-        put("Ипотека", "022007000000");
-        put("Арест", "022002000000");
-        put("Прочие ограничения прав и обременения объекта недвижимости", "022099000000");
     }};
 }
