@@ -65,7 +65,7 @@ public class App extends Application {
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setResizable(false);
-        //stage.setOnCloseRequest(e -> runClose(chosenFolder, logger));
+        stage.setOnCloseRequest(e -> runClose(chosenFolder, logger));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/style.css")).toExternalForm());
         stage.setTitle("XMLoader");
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png")));

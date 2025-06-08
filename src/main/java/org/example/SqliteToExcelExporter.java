@@ -48,6 +48,7 @@ public class SqliteToExcelExporter {
             Map<Integer, List<String>> filesRestrictions = new HashMap<>();
             Map<String, Integer> nameColumn = new HashMap<>();
             List<Integer> targetColumns = new ArrayList<>();
+
             for (String key : keys) {
                 Cell cell = headerRow.createCell(colNum++);
                 if (Storage.restrictions.containsKey(key)){
@@ -135,7 +136,21 @@ public class SqliteToExcelExporter {
                                 }
                             }
                         }
-                    } else flag = true;
+                        List<List<String>> ownList = DubolomParser.parseOwners(path);
+                        List<List<String>> rentList = DubolomParser.parseTenants(path);
+                        row.createCell(colNum).setCellValue(DubolomParser.parsePeople(ownList));
+                        row.createCell(colNum + 1).setCellValue(DubolomParser.parsePeople(rentList));
+                    }
+                    else {
+                        flag = true;
+                        row.getCell(colNum - 5).setCellValue("Прочее");
+                        row.getCell(colNum - 4).setCellValue("Запрещение");
+                        row.getCell(colNum - 3).setCellValue("Аренда");
+                        row.getCell(colNum - 2).setCellValue("Арест");
+                        row.getCell(colNum - 1).setCellValue("Ипотека");
+                        row.createCell(colNum).setCellValue("Собственники");
+                        row.createCell(colNum + 1).setCellValue("Арендаторы");
+                    }
                 }
             }
 

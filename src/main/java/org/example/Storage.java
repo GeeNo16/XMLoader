@@ -30,6 +30,7 @@ public class Storage {
         put("extract_about_property_land.land_record.object.common_data.cad_number", "Кадастровый номер");
         put("extract_about_property_land.right_records.right_record.right_data.right_type.value", "Вид права");
         put("extract_about_property_land.restrict_records.restrict_record.restrictions_encumbrances_data.restriction_encumbrance_type.value", "Ограничения");
+        put("extract_about_property_land.right_records.right_record.right_holders.right_holder.legal_entity.entity.government_entity.full_name", "Муниципальное образование");
     }};
 
     public static final Map<String, String> restrictions = new HashMap<>() {{
